@@ -206,32 +206,41 @@ function setTheme(theme){
   // add a temporary class to enable smooth transitions
   try{ document.documentElement.classList.add('with-transition'); }catch(e){ /* noop */ }
 
-  // create a subtle overlay to mask repaints during the theme switch
+  // respect prefers-reduced-motion
+  try{ if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { if (theme === 'light') document.documentElement.setAttribute('data-theme','light'); else document.documentElement.removeAttribute('data-theme'); localStorage.setItem('xd-theme', theme); setTimeout(()=>{ try{ document.documentElement.classList.remove('with-transition'); }catch(e){} }, 300); return; } }catch(e){}
+
+  // create a themed overlay to mask repaints during the theme switch
   try{
     const existing = document.querySelector('.theme-fade');
     if (existing) existing.remove();
     const overlay = document.createElement('div');
-    overlay.className = 'theme-fade';
+    overlay.className = 'theme-fade ' + (theme === 'light' ? 'light' : 'dark');
     document.body.appendChild(overlay);
     // force a reflow so transition can be applied
     // eslint-disable-next-line no-unused-expressions
     overlay.offsetWidth; // trigger reflow
-    overlay.classList.add('visible');
-    // ensure we remove the overlay later
-    const FADE_MS = 920; // should match CSS timing
 
-    if (theme === 'light') document.documentElement.setAttribute('data-theme','light');
-    else document.documentElement.removeAttribute('data-theme');
+    // fade overlay in
+    overlay.classList.add('visible');
+
+    // add animating class to trigger the cross-fade + micro-zoom
+    try{ if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) { document.documentElement.classList.add('theme-animating'); } }catch(e){}
+
+    // apply the theme while the overlay covers the page to avoid flashes
+    if (theme === 'light') document.documentElement.setAttribute('data-theme','light'); else document.documentElement.removeAttribute('data-theme');
     localStorage.setItem('xd-theme', theme);
+
+    // ensure we remove the overlay later
+    const FADE_MS = 1000; // should match CSS timing (updated to match CSS)
 
     // after a short delay, fade out the overlay and then remove transition class
     setTimeout(()=>{
       overlay.classList.remove('visible');
-      setTimeout(()=>{ try{ overlay.remove(); }catch(e){} }, 200);
-    }, FADE_MS - 200);
+      setTimeout(()=>{ try{ overlay.remove(); }catch(e){} }, 260);
+    }, FADE_MS - 220);
 
-    // remove the transition class after the fade + a bit of buffer
-    setTimeout(()=>{ try{ document.documentElement.classList.remove('with-transition'); }catch(e){} }, FADE_MS + 120);
+    // remove the transition and animating class after the fade + a bit of buffer
+    setTimeout(()=>{ try{ document.documentElement.classList.remove('with-transition'); document.documentElement.classList.remove('theme-animating'); }catch(e){} }, FADE_MS + 120);
   }catch(e){
     // fallback: just apply theme and remove transition after a safe timeout
     if (theme === 'light') document.documentElement.setAttribute('data-theme','light');

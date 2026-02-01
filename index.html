@@ -30,6 +30,10 @@
       <h1 class="store-name">XD STORE <small class="store-sub">(TOP 1)</small></h1>
       <div class="header-actions">
         <button id="theme-toggle" class="support-button" aria-label="Alternar tema">🌓</button>
+        <a href="pages/sobre.html" class="product-button cta-secondary" style="text-decoration:none;margin-right:8px;">Sobre</a>
+        <a href="pages/parceiros.html" class="product-button cta-secondary" style="text-decoration:none;margin-right:8px;">Parceiros</a>
+        <a href="pages/FAQ.html" class="product-button cta-secondary" style="text-decoration:none;margin-right:8px;">FAQ</a>
+        <a href="pages/Blog.html" class="product-button cta-secondary" style="text-decoration:none;margin-right:8px;">Novidades</a>
         <button id="open-cart" class="cart-button" aria-label="Abrir carrinho">
           Carrinho (<span class="cart-count">0</span>)
         </button>
@@ -101,13 +105,68 @@
         </div>
       </div>
     </div>
-  </aside>
+</aside>
 
   <!-- Botão de Suporte (Discord) -->
   <a href="https://discord.gg/3t7g9TbN5M" class="discord-support" target="_blank" rel="noopener noreferrer" aria-label="Suporte no Discord" title="Suporte no Discord (XD Store)">
     <img src="assets/images/discord.png" alt="Discord" width="20" height="20">
     <span>Suporte</span>
   </a>
+
+  <script>
+    // Robust theme toggle with wipe animation that applies the theme mid-animation.
+    (function(){
+      const btn = document.getElementById('theme-toggle');
+      if (!btn) return;
+      const DURATION = 1000; // ms (matches CSS)
+
+      btn.addEventListener('click', (e)=>{
+        // prevent other handlers to control timing and ensure visible animation
+        e.stopImmediatePropagation();
+        try{
+          if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+            // fallback: simple toggle
+            const cur = localStorage.getItem('xd-theme') || 'dark';
+            const next = cur === 'dark' ? 'light' : 'dark';
+            if (next === 'light') document.documentElement.setAttribute('data-theme','light'); else document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('xd-theme', next);
+            return;
+          }
+
+          // Determine next theme
+          const cur = localStorage.getItem('xd-theme') || 'dark';
+          const next = cur === 'dark' ? 'light' : 'dark';
+
+          // create wipe overlay and set theme to match target
+          const wipe = document.createElement('div');
+          wipe.className = 'theme-wipe ' + (next === 'light' ? 'light' : 'dark');
+          document.body.appendChild(wipe);
+
+          // trigger animation
+          // ensure micro animations run too
+          document.documentElement.classList.add('theme-animating','with-transition');
+          // start wipe
+          // small timeout to ensure element is in the DOM
+          setTimeout(()=> wipe.classList.add('active'), 10);
+
+          // apply theme midway so user sees transition
+          setTimeout(()=>{
+            if (next === 'light') document.documentElement.setAttribute('data-theme','light'); else document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('xd-theme', next);
+          }, DURATION/2);
+
+          // cleanup after animation
+          setTimeout(()=>{
+            wipe.classList.remove('active');
+            setTimeout(()=>{ try{ wipe.remove(); }catch(e){} }, 220);
+            document.documentElement.classList.remove('theme-animating');
+            setTimeout(()=>{ document.documentElement.classList.remove('with-transition'); }, 120);
+          }, DURATION + 80);
+
+        }catch(e){ /* noop */ }
+      });
+    })();
+  </script>
 
   <script type="module" src="js/ui.js"></script>
 </body>

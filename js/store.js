@@ -117,6 +117,35 @@ export function getCartTotal(){
   return cart.reduce((total, item) => total + (Number(item.price) || 0) * (Number(item.qty) || 1), 0);
 }
 
+export function applyCoupon(code, percentage){
+  localStorage.setItem('appliedCoupon', JSON.stringify({code, percentage: Number(percentage)}));
+}
+
+export function removeCoupon(){
+  localStorage.removeItem('appliedCoupon');
+}
+
+export function getAppliedCoupon(){
+  try{
+    const raw = localStorage.getItem('appliedCoupon');
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    return null;
+  }
+}
+
+export function getDiscount(subtotal){
+  const coupon = getAppliedCoupon();
+  if (!coupon) return 0;
+  return (subtotal * coupon.percentage) / 100;
+}
+
+export function getCartTotalWithDiscount(){
+  const subtotal = getCartTotal();
+  const discount = getDiscount(subtotal);
+  return subtotal - discount;
+}
+
 export function getCartCount(){
   const cart = getCart();
   return cart.reduce((total, item) => total + (Number(item.qty) || 1), 0);

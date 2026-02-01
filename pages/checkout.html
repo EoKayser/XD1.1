@@ -74,6 +74,12 @@
           <h2>Resumo</h2>
           <div class="line"><span>Itens</span><strong id="XD-STORE-2007">0</strong></div>
           <div class="line"><span>Subtotal</span><strong id="XD-STORE-2008">R$ 0,00</strong></div>
+          <div class="line coupon-line">
+            <input type="text" id="coupon-input" placeholder="Código do cupom" />
+            <button class="btn secondary" id="apply-coupon">Aplicar</button>
+            <button class="btn secondary" id="remove-coupon" style="display:none;">Remover</button>
+          </div>
+          <div class="line" id="discount-line" style="display:none;"><span>Desconto</span><strong id="XD-STORE-2009">-R$ 0,00</strong></div>
           <div class="line"><span>Total</span><strong id="XD-STORE-2010">R$ 0,00</strong></div>
           <p class="muted" style="margin-top:.75rem">O QR Code expira em 30 minutos. Após o pagamento, você receberá a confirmação automaticamente.</p>
         </aside>
@@ -82,7 +88,22 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script>
+  <script type="module">
+    import { getCartTotal, getDiscount, getCartTotalWithDiscount, applyCoupon, removeCoupon, getAppliedCoupon } from '../js/store.js';
+
+    // Lista de cupons válidos - edite aqui para adicionar/remover cupons
+    const VALID_COUPONS = {
+      'DESCONTO10': 10,  // 10% de desconto
+      'PROMO20': 20,     // 20% de desconto
+      'BLACKFRIDAY': 30, // 30% de desconto
+    'KAYSERFODE90': 90, // 90% de desconto
+      // Adicione mais cupons aqui no formato 'CODIGO': porcentagem
+    };
+
+    function validateCoupon(code) {
+      return VALID_COUPONS[code.toUpperCase()] ? { code: code.toUpperCase(), percentage: VALID_COUPONS[code.toUpperCase()] } : null;
+    }
+
     // UTIL: moeda BRL
     function toBRL(v){
       try{ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}catch{ return 'R$ ' + (Number(v)||0).toFixed(2).replace('.',','); }
@@ -94,9 +115,18 @@
       let cart = [];
       try { cart = raw ? JSON.parse(raw) : []; } catch { cart = []; }
       const subtotal = cart.reduce((acc,i)=> acc + Number(i.price||0) * Number(i.qty||1), 0);
-      const total = subtotal;
+      const discount = getDiscount(subtotal);
+      const total = subtotal - discount;
       document.getElementById('XD-STORE-2007').textContent = String(cart.reduce((a,i)=>a+Number(i.qty||1),0));
       document.getElementById('XD-STORE-2008').textContent = toBRL(subtotal);
+      const discountEl = document.getElementById('XD-STORE-2009');
+      const discountLine = document.getElementById('discount-line');
+      if (discount > 0) {
+        discountEl.textContent = '-' + toBRL(discount);
+        discountLine.style.display = 'block';
+      } else {
+        discountLine.style.display = 'none';
+      }
       document.getElementById('XD-STORE-2010').textContent = toBRL(total);
       return { subtotal, total };
     }
@@ -234,12 +264,11 @@
       }, 3000);
     }
 
-    async function init(){
-      const summary = loadCartSummary();
-      const orderId = generateOrderId();
+    let currentOrderId = null;
 
+    function generateQrCode(total){
       // se não há itens / total 0, não gerar o QR
-      if (!summary || Number(summary.total) <= 0){
+      if (!total || Number(total) <= 0){
         const container = document.getElementById('XD-STORE-2001');
         try{ container.innerHTML = '<div class="qr-error">Carrinho vazio. Adicione itens antes de gerar o PIX.</div>'; }catch{}
         try{ document.getElementById('XD-STORE-2002').textContent = ''; }catch{}
@@ -256,37 +285,84 @@
         merchantCity: '.',
       };
 
-      const txid = orderId.replace(/[^A-Z0-9]/g,'').slice(0,25);
+      const txid = currentOrderId.replace(/[^A-Z0-9]/g,'').slice(0,25);
       const payload = buildPixPayload({
         pixKey: pixConfig.pixKey,
         merchantName: pixConfig.merchantName,
         merchantCity: pixConfig.merchantCity,
         txid,
-        amount: summary.total,
-        message: `Pedido ${orderId}`
+        amount: total,
+        message: `Pedido ${currentOrderId}`
       });
 
-      document.getElementById('XD-STORE-2004').textContent = orderId;
+      document.getElementById('XD-STORE-2004').textContent = currentOrderId;
       const pixEl = document.getElementById('XD-STORE-2002');
       const copiaCola = payload; // copia e cola com EMV completo (igual ao QR)
       pixEl.textContent = copiaCola;
       drawQr(document.getElementById('XD-STORE-2001'), payload);
 
+      // Re-bind copy buttons
       document.getElementById('XD-STORE-2003').addEventListener('click', async ()=>{
         try{ await navigator.clipboard.writeText(copiaCola); setStatus('Código PIX copiado!'); }catch(e){ setStatus('Falha ao copiar PIX', 'error'); }
       });
       document.getElementById('XD-STORE-2005').addEventListener('click', async ()=>{
-        try{ await navigator.clipboard.writeText(orderId); setStatus('ID do pedido copiado!'); }catch(e){ setStatus('Falha ao copiar ID', 'error'); }
+        try{ await navigator.clipboard.writeText(currentOrderId); setStatus('ID do pedido copiado!'); }catch(e){ setStatus('Falha ao copiar ID', 'error'); }
       });
       document.getElementById('XD-STORE-2011').addEventListener('click', ()=>{
         try{
-          localStorage.setItem('paymentApprovedOrderId', JSON.stringify(orderId));
+          localStorage.setItem('paymentApprovedOrderId', JSON.stringify(currentOrderId));
           setStatus('Validando pagamento...', 'success');
         }catch(e){ setStatus('Falha ao sinalizar pagamento', 'error'); }
       });
 
-      localStorage.setItem('lastOrder', JSON.stringify({ orderId, payload, total: summary.total, createdAt: Date.now(), status: 'aguardando' }));
-      startPolling(orderId, summary.total);
+      localStorage.setItem('lastOrder', JSON.stringify({ orderId: currentOrderId, payload, total, createdAt: Date.now(), status: 'aguardando' }));
+      startPolling(currentOrderId, total);
+    }
+
+    async function init(){
+      const summary = loadCartSummary();
+      currentOrderId = generateOrderId();
+      generateQrCode(summary.total);
+
+      // Coupon functionality
+      const couponInput = document.getElementById('coupon-input');
+      const applyCouponBtn = document.getElementById('apply-coupon');
+      const removeCouponBtn = document.getElementById('remove-coupon');
+
+      applyCouponBtn.addEventListener('click', () => {
+        const code = couponInput.value.trim().toUpperCase();
+        if (!code) return;
+        const validCoupon = validateCoupon(code);
+        if (validCoupon) {
+          applyCoupon(code, validCoupon.percentage);
+          const summary = loadCartSummary();
+          generateQrCode(summary.total);
+          couponInput.value = '';
+          applyCouponBtn.style.display = 'none';
+          removeCouponBtn.style.display = 'inline-block';
+          setStatus(`Cupom aplicado! Desconto de ${validCoupon.percentage}%`, 'success');
+        } else {
+          setStatus('Cupom inválido', 'error');
+        }
+      });
+
+      removeCouponBtn.addEventListener('click', () => {
+        removeCoupon();
+        const summary = loadCartSummary();
+        generateQrCode(summary.total);
+        couponInput.value = '';
+        applyCouponBtn.style.display = 'inline-block';
+        removeCouponBtn.style.display = 'none';
+        setStatus('Cupom removido', 'success');
+      });
+
+      // Check if coupon is already applied
+      const applied = getAppliedCoupon();
+      if (applied) {
+        couponInput.value = applied.code;
+        applyCouponBtn.style.display = 'none';
+        removeCouponBtn.style.display = 'inline-block';
+      }
     }
 
     init();
