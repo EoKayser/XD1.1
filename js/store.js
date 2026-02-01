@@ -6,47 +6,56 @@
 const PRODUCTS = [
   {
     id: 1,
-    name: "Espada de Diamante",
-    price: 149.90,
+    name: "Minecraft Full Acesso",
+    price: 70.00,
     promoEnabled: true,
-    promoPrice: 119.90,
+    promoPrice: 50.00,
     img: "assets/images/produto1.png",
     description: "Espada poderosa para derrotar mobs e chefes"
   },
   {
     id: 2,
-    name: "Calça Jeans",
-    price: 129.90,
+    name: "Minecraft SFA",
+    price: 2.50,
     img: "assets/images/produto2.png",
     description: "Picareta eficiente para mineração rápida"
   },
   {
     id: 3,
-    name: "Poção de Cura (x3)",
-    price: 29.90,
+    name: "Conta + Capa",
+    price: 90.00,
     img: "assets/images/produto3.png",
     description: "Três poções de cura para emergências"
   },
   {
     id: 4,
-    name: "Armadura de Ferro (set)",
-    price: 199.90,
+    name: "Capa Optifine (SFA)",
+    price: 5.00,
     img: "assets/images/produto4.png",
     description: "Conjunto de armadura para proteção confiável"
   },
   {
     id: 5,
-    name: "Tochas (x64)",
-    price: 9.90,
+    name: "Capa Optifine FA",
+    price: 30.00,
     img: "assets/images/produto5.png",
     description: "Pacote com 64 tochas para iluminar suas cavernas"
   },
   {
     id: 6,
-    name: "Bloco de Grama",
-    price: 4.90,
+    name: "Método Unban",
+    price: 5.00,
     img: "assets/images/produto6.png",
     description: "Bloco decorativo para construção e paisagismo"
+  },
+  {
+    id: 7,
+    name: "Skin Profissional",
+    price: 19.90,
+    promoEnabled: true,
+    promoPrice: 14.90,
+    img: "assets/images/produto7.png",
+    description: "Pacote especial com itens exclusivos para servidores"
   }
 ];
 

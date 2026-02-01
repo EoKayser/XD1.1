@@ -5,6 +5,9 @@
 body {
   background-color: var(--bg);
   color: var(--text);
+  font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
 /* Container padrão para centralizar conteúdo */
@@ -35,9 +38,23 @@ body {
 .header-actions { display:flex; gap:8px; align-items:center; }
 
 .store-name {
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
+
+.store-name .store-sub {
+  font-size:0.75rem;
+  padding:4px 8px;
+  background: linear-gradient(90deg,var(--primary),var(--primary-2));
+  color:#fff;
+  border-radius:999px;
+  font-weight:700;
+  margin-left:6px;
+} 
 
 /* ================================
    MAIN

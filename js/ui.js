@@ -114,6 +114,20 @@ export function renderCart() {
   cartCount.textContent = getCartCount();
   cartTotal.textContent = toBRL(getCartTotal());
 
+  // enable/disable checkout link based on cart contents
+  const checkoutBtn = document.querySelector('.checkout-button');
+  if (checkoutBtn) {
+    if (cart.length === 0) {
+      checkoutBtn.classList.add('disabled');
+      checkoutBtn.setAttribute('aria-disabled', 'true');
+      checkoutBtn.setAttribute('tabindex','-1');
+    } else {
+      checkoutBtn.classList.remove('disabled');
+      checkoutBtn.removeAttribute('aria-disabled');
+      checkoutBtn.removeAttribute('tabindex');
+    }
+  }
+
   bindCartItemEvents();
 }
 
@@ -191,11 +205,40 @@ export function bindCartControls() {
 function setTheme(theme){
   // add a temporary class to enable smooth transitions
   try{ document.documentElement.classList.add('with-transition'); }catch(e){ /* noop */ }
-  if (theme === 'light') document.documentElement.setAttribute('data-theme','light');
-  else document.documentElement.removeAttribute('data-theme');
-  localStorage.setItem('xd-theme', theme);
-  // remove the transition class shortly after to prevent future instantaneous changes being animated
-  setTimeout(()=>{ try{ document.documentElement.classList.remove('with-transition'); }catch(e){} }, 350);
+
+  // create a subtle overlay to mask repaints during the theme switch
+  try{
+    const existing = document.querySelector('.theme-fade');
+    if (existing) existing.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'theme-fade';
+    document.body.appendChild(overlay);
+    // force a reflow so transition can be applied
+    // eslint-disable-next-line no-unused-expressions
+    overlay.offsetWidth; // trigger reflow
+    overlay.classList.add('visible');
+    // ensure we remove the overlay later
+    const FADE_MS = 920; // should match CSS timing
+
+    if (theme === 'light') document.documentElement.setAttribute('data-theme','light');
+    else document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('xd-theme', theme);
+
+    // after a short delay, fade out the overlay and then remove transition class
+    setTimeout(()=>{
+      overlay.classList.remove('visible');
+      setTimeout(()=>{ try{ overlay.remove(); }catch(e){} }, 200);
+    }, FADE_MS - 200);
+
+    // remove the transition class after the fade + a bit of buffer
+    setTimeout(()=>{ try{ document.documentElement.classList.remove('with-transition'); }catch(e){} }, FADE_MS + 120);
+  }catch(e){
+    // fallback: just apply theme and remove transition after a safe timeout
+    if (theme === 'light') document.documentElement.setAttribute('data-theme','light');
+    else document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('xd-theme', theme);
+    setTimeout(()=>{ try{ document.documentElement.classList.remove('with-transition'); }catch(e){} }, 1000);
+  }
 }
 
 function toggleTheme(){

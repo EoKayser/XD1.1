@@ -36,6 +36,12 @@
     .badge { display:inline-block; font-size:.8rem; padding:.2rem .5rem; border-radius: 999px; background: var(--surface); color: var(--text); border: 1px solid var(--primary); }
     .error { background: #3f1a1a; color:#FCA5A5; }
     .success { background:#1b1530; color:#C4B5FD; }
+
+    /* mensagem de erro ao gerar QR */
+    .qr-error { color: var(--muted); padding: 12px; text-align: center; }
+
+    /* estados desabilitados para botões */
+    .btn[disabled] { opacity: 0.6; pointer-events: none; filter: grayscale(35%); }
   </style>
 </head>
 <body>
@@ -169,7 +175,23 @@
     // Renderiza QR Code usando QRCode.js (CDN)
     function drawQr(container, text){
       try { container.innerHTML = ''; } catch {}
-      new QRCode(container, { text, width: 256, height: 256, colorDark: '#111827', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+      try{
+        const styles = getComputedStyle(document.documentElement);
+        const colorDark = (styles.getPropertyValue('--text') || '#111827').trim();
+        const colorLight = (styles.getPropertyValue('--surface') || '#ffffff').trim();
+        // prefer high error correction for payment QR codes
+        new QRCode(container, { text, width: 256, height: 256, colorDark: colorDark, colorLight: colorLight, correctLevel: QRCode.CorrectLevel.H });
+        // give the generated element a stable id for styling/debugging
+        const child = container.firstElementChild;
+        if (child && !child.id) child.id = 'XD-STORE-2001-canvas';
+      }catch(e){
+        console.error('QR generation failed', e);
+        const fallback = document.createElement('div');
+        fallback.className = 'qr-error';
+        fallback.textContent = 'Falha ao gerar QR. Use o código abaixo ou tente novamente.';
+        try{ container.appendChild(fallback); }catch{};
+        setStatus('Falha ao gerar QR', 'error');
+      }
     }
 
     // QRious minimal inline
@@ -215,6 +237,17 @@
     async function init(){
       const summary = loadCartSummary();
       const orderId = generateOrderId();
+
+      // se não há itens / total 0, não gerar o QR
+      if (!summary || Number(summary.total) <= 0){
+        const container = document.getElementById('XD-STORE-2001');
+        try{ container.innerHTML = '<div class="qr-error">Carrinho vazio. Adicione itens antes de gerar o PIX.</div>'; }catch{}
+        try{ document.getElementById('XD-STORE-2002').textContent = ''; }catch{}
+        try{ document.getElementById('XD-STORE-2003').setAttribute('disabled','disabled'); }catch{}
+        try{ document.getElementById('XD-STORE-2011').setAttribute('disabled','disabled'); }catch{}
+        setStatus('Carrinho vazio. Adicione itens para gerar o PIX.', 'error');
+        return;
+      }
 
       // Config PIX pessoal (ocultar nome/cidade)
       const pixConfig = {
