@@ -1,0 +1,84 @@
+/* ================================
+   COMPONENTES: PRODUTOS E PROMOÇÕES
+   ================================ */
+
+/* Card de produto com borda roxa e fundo preto leve */
+.product-card {
+  background: #0b0b0f;
+  border: 2px solid #6a0dad;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(106, 13, 173, 0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #0f0f18;
+  display: grid;
+  place-items: center;
+}
+
+.product-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.product-name {
+  margin: 0;
+  font-size: 1rem;
+  color: #e5e7eb;
+}
+
+.product-price {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #a78bfa; /* valor padrão quando não está em promo */
+}
+
+/* Preço quando há promoção */
+.price-old {
+  text-decoration: line-through;
+  color: #9CA3AF;
+  margin-right: .4rem;
+}
+
+.price-new {
+  color: #E879F9;
+  font-weight: 700;
+}
+
+/* Badge de promoção */
+.badge-promo {
+  display: inline-block;
+  font-size: .75rem;
+  padding: .2rem .5rem;
+  border-radius: 999px;
+  background: #EDE9FE;
+  color: #5B21B6;
+  width: fit-content;
+}
+
+/* Botão padrão do card */
+.product-button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 10px;
+  padding: .65rem .9rem;
+  background: #6a0dad;
+  color: #fff;
+  font-weight: 600;
+}
+
+.product-button:hover {
+  filter: brightness(1.05);
+}

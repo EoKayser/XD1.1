@@ -1,0 +1,107 @@
+/* ================================
+   BASE GLOBAL
+   ================================ */
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Container padrão para centralizar conteúdo */
+.header-container,
+.footer-container,
+.site-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ================================
+   HEADER
+   ================================ */
+
+.site-header {
+  background-color: var(--surface);
+  border-bottom: 2px solid var(--primary);
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+
+.header-actions { display:flex; gap:8px; align-items:center; }
+
+.store-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* ================================
+   MAIN
+   ================================ */
+
+.site-main {
+  padding: 40px 20px;
+}
+
+.site-main section {
+  margin-bottom: 60px;
+}
+
+/* Apresentação */
+.store-title {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.store-description {
+  max-width: 600px;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Produtos */
+.section-title {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+}
+
+.products-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+/* ================================
+   FOOTER
+   ================================ */
+
+.site-footer {
+  border-top: 1px solid rgba(255,255,255,0.04);
+  padding: 30px 0;
+  background: var(--surface);
+}
+
+.footer-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-store-name {
+  font-weight: bold;
+  color: var(--text);
+}
+
+.footer-text {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.footer-legal {
+  font-size: 0.8rem;
+  color: var(--muted);
+}

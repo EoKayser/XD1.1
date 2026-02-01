@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XD Store - Loja de Roupas</title>
+  <link rel="icon" type="image/png" href="assets/icons/xd.png">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+  <div class="announcement" role="region" aria-live="polite">
+    <div class="announcement-inner">
+      <div class="led-screen" aria-hidden="false">
+        <div class="marquee" aria-hidden="false">
+          <span>⚡ Promoções ativas • Entrega digital imediata • Suporte via Discord</span>
+          <span aria-hidden="true">⚡ Promoções ativas • Entrega digital imediata • Suporte via Discord</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-container">
+      <h1 class="store-name">Loja de Minecraft <small class="store-sub">(XD)</small></h1>
+      <div class="header-actions">
+        <button id="theme-toggle" class="support-button" aria-label="Alternar tema">🌓</button>
+        <button id="open-cart" class="cart-button" aria-label="Abrir carrinho">
+          Carrinho (<span class="cart-count">0</span>)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="site-main">
+
+    <section class="welcome-panel">
+      <div class="welcome-inner">
+        <div class="welcome-visual">
+          <img src="assets/images/produto6.png" alt="Bloco de Grama" width="120" height="120">
+        </div>
+
+        <div class="welcome-content">
+          <div class="welcome-header">
+            <h2 class="welcome-title">Bem-vindo à <span class="highlight">Loja de Minecraft</span></h2>
+            <div class="welcome-badge">⚡ Entrega digital imediata</div>
+          </div>
+
+          <p class="welcome-lead">Itens digitais para sua diversão no servidor — <strong>entrega 100% digital e imediata</strong> após confirmação de pagamento.</p>
+
+          <p class="welcome-body">Aqui você encontra <strong>kits, conteúdos e utilitários exclusivos</strong>. Produtos digitais são entregues via Discord de forma rápida e segura. Se tiver dúvidas, abra um ticket no nosso servidor — nosso time responde rápido.</p>
+
+          <ul class="welcome-features" aria-hidden="false">
+            <li>✅ Entrega via Discord em minutos</li>
+            <li>💎 Itens exclusivos e atualizados</li>
+            <li>🛡️ Suporte confiável para resgate</li>
+          </ul>
+
+          <div class="welcome-ctas">
+            <button id="view-promos" class="product-button">Ver promoções</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="products-section">
+      <h2 class="section-title">Nossos Produtos</h2>
+      <div class="products-list"></div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p class="footer-store-name">Loja de Minecraft (XD)</p>
+      <p class="footer-text">Itens digitais, entrega imediata via Discord</p>
+      <p class="footer-legal">© 2024 Loja de Minecraft. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Carrinho lateral -->
+  <div id="cart-overlay" class="cart-overlay"></div>
+  <aside id="cart-sidebar" class="cart-sidebar">
+    <div class="cart-header">
+      <h3>Carrinho</h3>
+      <button id="close-cart" class="close-cart">×</button>
+    </div>
+    <div class="cart-items"></div>
+    <div class="cart-footer">
+      <p>Total: <strong id="cart-total">R$ 0,00</strong></p>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="clear-cart" aria-label="Limpar carrinho" style="background:#ff5555;color:#fff;border:none;padding:8px;border-radius:8px;">Limpar carrinho</button>
+      </div>
+    </div>
+  </aside>
+
+  <script type="module" src="js/ui.js"></script>
+</body>
+</html>
