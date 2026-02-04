@@ -309,6 +309,12 @@ function initMarquee(){
   document.head.appendChild(style);
 }
 
+/* ---------- MOBILE DETECTION ---------- */
+function detectMobile() {
+  const isMobile = window.innerWidth < 768;
+  document.body.classList.toggle('mobile', isMobile);
+}
+
 /* ---------- INIT ---------- */
 export async function initUI() {
   initTheme();
@@ -317,7 +323,9 @@ export async function initUI() {
   bindCartControls();
   bindPromoButton();
   initMarquee();
+  detectMobile();
   window.addEventListener('resize', debounce(initMarquee, 200));
+  window.addEventListener('resize', debounce(detectMobile, 200));
 }
 
 // Auto init on DOMContentLoaded

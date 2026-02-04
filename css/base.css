@@ -122,3 +122,86 @@ body {
   font-size: 0.8rem;
   color: var(--muted);
 }
+
+/* ================================
+   MOBILE LAYOUT
+   ================================ */
+
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    height: auto;
+    padding: 16px 20px;
+  }
+
+  .store-name {
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+  }
+
+  .header-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .header-actions .product-button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .cart-button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .products-list {
+    grid-template-columns: 1fr;
+  }
+
+  .site-main {
+    padding: 20px 10px;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .cart-sidebar {
+    width: 100vw;
+    right: -100vw;
+  }
+
+  .cart-sidebar.active {
+    right: 0;
+  }
+
+  .welcome-panel {
+    padding: 20px 10px;
+  }
+
+  .welcome-inner {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .welcome-visual img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .welcome-title {
+    font-size: 1.4rem;
+  }
+
+  .welcome-features {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .welcome-ctas {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
